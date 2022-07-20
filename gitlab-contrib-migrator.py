@@ -7,15 +7,18 @@ import os
 from tqdm import tqdm
 
 
-def createNumOfCommitsOnDate(numOfCommits, date):
-    if numOfCommits > 30:
-        numOfCommits = 30
+
+def createNumOfCommitsOnDate(contribCount, date):
+    numOfCommits = contribCount
+    for i in range(contribCount):
+        os.system('echo "Commit number {} on {}" >> commit.md'.format(i+1, date.strftime("%m-%d-%Y")))
+
     for i in tqdm(range(numOfCommits)):
-        os.system('echo "Commit number {} on {}" >> commit.md'.format((i+1), date.strftime("%m-%d-%Y")), shell=True)
-        os.system('set GIT_COMMITTER_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")), shell=True)
-        os.system('set GIT_AUTHOR_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")), shell=True)
-        os.system('git add --all > NUL', shell=True)
-        os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > NUL'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")), shell=True)
+        os.system('echo "Commit number {} on {}" >> commit.md'.format(i+1, date.strftime("%m-%d-%Y")))
+        os.system('set GIT_COMMITTER_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
+        os.system('set GIT_AUTHOR_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
+        os.system('git add --all > NUL')
+        os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > NUL'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")))
 """       
 def createNumOfCommitsOnDate(numOfCommits, date):
     if numOfCommits > 30:
@@ -28,16 +31,16 @@ def createNumOfCommitsOnDate(numOfCommits, date):
         os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > /dev/null'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")))
 """ 
 def parseHTMLAndCreateCommits(htmlContents, startDate):
-    fullHtml = BeautifulSoup(htmlContents, 'html.parser')
-    dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell has-tooltip"})
+    soup = BeautifulSoup(htmlContents, 'html.parser')
+    dateRects = soup.find_all("rect", {"class": "user-contrib-cell has-tooltip"})
     print("Starting commits!\n")
     for dateRect in tqdm(dateRects):
-        contribsAndDate = dateRect["data-original-title"].split("<br />")
+        contribsAndDate = dateRect["title"].split("<br />")
         try:
             contribCount = int(contribsAndDate[0].split(" ")[0])
         except ValueError:
             continue
-        date = datetime.strptime(contribsAndDate[1], '%A %b %d, %Y')
+        date = datetime.strptime(contribsAndDate[1], '<span class="gl-text-gray-300">%A %b %d, %Y</span>')
         if startDate == -1 or startDate <= date:
             createNumOfCommitsOnDate(contribCount, date)
     print("Created commits for contrib chart! Use 'git push' to push to remote or use 'git log' to check commit log")
