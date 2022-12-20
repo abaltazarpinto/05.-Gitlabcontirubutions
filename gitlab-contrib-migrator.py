@@ -29,7 +29,7 @@ def createNumOfCommitsOnDate(numOfCommits, date):
 """ 
 def parseHTMLAndCreateCommits(htmlContents, startDate):
     fullHtml = BeautifulSoup(htmlContents, 'html.parser')
-    dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell.has-tooltip"})
+    dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell has-tooltip"})
     print("Starting commits!\n")
     for dateRect in tqdm(dateRects):
         contribsAndDate = dateRect["data-original-title"].split("<br />")
