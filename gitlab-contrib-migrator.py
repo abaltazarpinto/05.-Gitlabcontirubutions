@@ -7,7 +7,7 @@ import os
 from tqdm import tqdm
 
 
-
+#function that creates the commits based on the number of contributions and date
 def createNumOfCommitsOnDate(contribCount, date):
     numOfCommits = contribCount
     for i in range(contribCount):
@@ -30,6 +30,7 @@ def createNumOfCommitsOnDate(numOfCommits, date):
         os.system('git add --all > /dev/null')
         os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > /dev/null'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")))
 """ 
+#function that parses the HTML and creates the commits
 def parseHTMLAndCreateCommits(htmlContents, startDate):
     soup = BeautifulSoup(htmlContents, 'html.parser')
     dateRects = soup.find_all("rect", {"class": "user-contrib-cell has-tooltip"})
@@ -45,7 +46,7 @@ def parseHTMLAndCreateCommits(htmlContents, startDate):
             createNumOfCommitsOnDate(contribCount, date)
     print("Created commits for contrib chart! Use 'git push' to push to remote or use 'git log' to check commit log")
 
-
+#function that parses the arguments
 def parseArgs(argv):
     if (len(argv) < 2):
         print( "Help - Try running: \n\ngitlab-contrib-migrator.py <htmlFile> <startDate> \n\nhtmlFile = HTML file with GitLab info \nstartDate = start commit date in MM-DD-YYYY format" )
@@ -64,10 +65,11 @@ def parseArgs(argv):
             print( "Error trying to parse start commit date: {} - proceeding without start date".format(argv[2]) )
     return (htmlContents, -1)
 
+#main function that calls the other functions
 def main(argv):
     htmlContents, startDate = parseArgs(argv)
     parseHTMLAndCreateCommits(htmlContents, startDate)
 
-
+#checks if the code is being run as the main program
 if __name__ == "__main__":
    main(sys.argv)
